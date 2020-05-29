@@ -42,11 +42,8 @@
 // in the presented order. The first working server will be used for
 // the whole session.
 //
-var server = null;
-if(window.location.protocol === 'http:')
-	server = "http://" + window.location.hostname + ":8088/janus";
-else
-	server = "https://" + window.location.hostname + ":8089/janus";
+var server = "https://" +"mcm.assetcontrol.mx" + ":8089/janus";
+
 
 var janus = null;
 var sipcall = null;
@@ -838,8 +835,9 @@ function doCall(ev) {
 	$('#peer' + suffix).attr('disabled', true);
 	$('#call' + suffix).attr('disabled', true).unbind('click');
 	$('#dovideo' + suffix).attr('disabled', true);
+	console.log('en doCall')
 	var username = $('#peer' + suffix).val();
-	if(username === "") {
+	/*if(username === "") {
 		bootbox.alert('Please insert a valid SIP address (e.g., sip:pluto@example.com)');
 		$('#peer' + suffix).removeAttr('disabled');
 		$('#dovideo' + suffix).removeAttr('disabled');
@@ -852,13 +850,18 @@ function doCall(ev) {
 		$('#dovideo' + suffix).removeAttr('disabled').val("");
 		$('#call' + suffix).removeAttr('disabled').click(function() { doCall(helperId); });
 		return;
-	}
+	}*/
 	// Call this URI
 	doVideo = $('#dovideo' + suffix).is(':checked');
+	console.log(doVideo)
 	Janus.log(prefix + "This is a SIP " + (doVideo ? "video" : "audio") + " call (dovideo=" + doVideo + ")");
 	actuallyDoCall(handle, $('#peer' + suffix).val(), doVideo);
 }
 function actuallyDoCall(handle, uri, doVideo, referId) {
+	console.log(handle)
+	console.log(uri)
+	console.log(doVideo)
+	console.log(referId)
 	handle.createOffer(
 		{
 			media: {
@@ -866,6 +869,8 @@ function actuallyDoCall(handle, uri, doVideo, referId) {
 				videoSend: doVideo, videoRecv: doVideo	// We MAY want video
 			},
 			success: function(jsep) {
+				console.log('antes de succes function')
+				console.log(jsep)
 				Janus.debug("Got SDP!", jsep);
 				// By default, you only pass the SIP URI to call as an
 				// argument to a "call" request. Should you want the
@@ -902,6 +907,8 @@ function actuallyDoCall(handle, uri, doVideo, referId) {
 				handle.send({ message: body, jsep: jsep });
 			},
 			error: function(error) {
+				console.log("hubo error")
+				console.log(error)
 				Janus.error(prefix + "WebRTC error...", error);
 				bootbox.alert("WebRTC error... " + error.message);
 			}
